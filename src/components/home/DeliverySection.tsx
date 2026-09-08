@@ -6,6 +6,7 @@ import { Truck, MapPin, Shield, Clock, CheckCircle, Search } from 'lucide-react'
 import { ScrollReveal, ScrollRevealItem } from '@/components/animations/ScrollReveal';
 import { wilayas, getCommunesByWilaya, calculateDeliveryPrice, deliveryMethods } from '@/lib/delivery';
 import { Input, Select } from '@/components/ui/Input';
+import { SparklesText } from '@/components/magicui/sparkles-text';
 import { cn } from '@/lib/utils';
 
 const steps = [
@@ -70,7 +71,12 @@ export function DeliverySection() {
         <ScrollReveal>
           <div className="max-w-2xl mx-auto mb-16">
             <div className="p-8 rounded-2xl bg-black border border-gray-700">
-              <h3 className="text-heading-md font-chillax font-bold text-white mb-6 text-center">Calculez votre livraison</h3>
+              <SparklesText
+                text="Calculez votre livraison"
+                className="text-heading-md font-chillax font-bold text-white mb-6 text-center"
+                colors={{ first: '#FF3B44', second: '#FFFFFF' }}
+                sparklesCount={12}
+              />
 
               <div className="space-y-4 mb-6">
                 <Select
