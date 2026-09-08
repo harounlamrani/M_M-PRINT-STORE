@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/lib/store';
+import { MorphingText } from '@/components/magicui/morphing-text';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -17,6 +18,8 @@ const navigation = [
   { label: 'Livraison', href: '#delivery' },
   { label: 'Contact', href: '#contact' },
 ];
+
+const LOGO_TEXTS = ['M_M', 'PRINT STORE'];
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,11 +46,10 @@ export function Header() {
         <div className={cn('flex items-center justify-between transition-all duration-200', scrolled ? 'h-10 lg:h-12' : 'h-12 lg:h-14')}>
           <Link
             href="/"
-            className="flex items-center gap-2 text-display-sm font-chillax font-bold tracking-tight text-mm-white hover:opacity-80 transition-opacity"
+            className="flex items-center text-mm-white hover:opacity-80 transition-opacity"
             aria-label="M_M PRINT STORE - Accueil"
           >
-            <span className="text-mm-white">M_</span>
-            <span>M</span>
+            <MorphingText texts={LOGO_TEXTS} className="h-8 w-44 text-xl text-mm-white" />
           </Link>
 
           <div className="hidden lg:flex items-center gap-8">
@@ -106,10 +108,7 @@ export function Header() {
             aria-label="Menu mobile"
           >
             <div className="flex items-center justify-between p-6 border-b border-mm-white/10">
-              <span className="text-display-sm font-chillax font-bold tracking-tight">
-                <span className="text-mm-red">M_</span>
-                <span>M</span>
-              </span>
+              <MorphingText texts={LOGO_TEXTS} className="h-8 w-44 text-xl text-mm-white" />
               <button
                 onClick={() => setIsMenuOpen(false)}
                 className="p-2 text-mm-white hover:text-mm-red transition-colors"
