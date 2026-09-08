@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, ShoppingBag } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
 import { Particles } from '@/components/magicui/particles';
 
 export function Hero() {
@@ -49,12 +50,10 @@ export function Hero() {
             transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <a href="#tshirts">
-              <Button size="lg" className="group w-full sm:w-auto">
-                <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+            <a href="#tshirts" className="w-full sm:w-auto">
+              <InteractiveHoverButton className="w-full sm:w-auto">
                 Découvrir la collection
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-              </Button>
+              </InteractiveHoverButton>
             </a>
             <a href="#ensembles">
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
