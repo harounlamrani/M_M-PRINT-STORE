@@ -140,18 +140,28 @@ export const products: Product[] = [
     id: 'tee-oversized',
     slug: 'tee-oversized',
     name: 'T-Shirt Oversized',
-    description: '280 GSM coton peigné, coupe Oversized ample, épaules très tombantes, manches longues. Même base que le Regular mais volume max. Teinture vêtement pour un aspect vintage. Fabriqué en Algérie.',
+    description: '280 GSM coton peigné, coupe Oversized ample, épaules très tombantes, manches longues. Même base que le Regular mais volume max. Teinture vêtement pour un aspect vintage. Édition Charcoal : imprimé script rose au dos. Fabriqué en Algérie.',
     shortDescription: '280 GSM coton peigné, coupe Oversized, teinture vêtement',
     category: 'tshirts',
     basePrice: 2500,
     images: [
+      {
+        src: '/images/products/t-shirt-oversized-charcoal.webp',
+        alt: 'T-Shirt Oversized Charcoal — imprimé script rose au dos',
+        width: 1200,
+        height: 1500,
+      },
       placeholderImage('T-Shirt Oversized Black', 1200, 1500),
       placeholderImage('T-Shirt Oversized White', 1200, 1500),
       placeholderImage('T-Shirt Oversized Gray', 1200, 1500),
       placeholderImage('T-Shirt Oversized Navy', 1200, 1500),
     ],
-    options: [createSizeOption(), createColorOption(teeColors)],
-    variants: createTeeVariants('tee-ovs', 'T-Shirt Oversized', 2500, teeColors),
+    options: [createSizeOption(), createColorOption([...teeColors, 'Charcoal'])],
+    variants: createTeeVariants('tee-ovs', 'T-Shirt Oversized', 2500, [...teeColors, 'Charcoal']).map((v) =>
+      v.id === 'tee-ovs-charcoal'
+        ? { ...v, image: '/images/products/t-shirt-oversized-charcoal.webp' }
+        : v
+    ),
     featured: true,
     newArrival: true,
     tags: ['tshirts', 'oversized', 'cotton', 'garment-dyed', 'made-in-algeria'],
