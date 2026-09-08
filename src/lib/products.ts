@@ -268,17 +268,27 @@ export const products: Product[] = [
     id: 'hoodie-cropped',
     slug: 'hoodie-cropped',
     name: 'Hoodie Cropped',
-    description: 'Hoodie 420 GSM coton mélangé, coupe cropped, capuche doublée, cordon de serrage, poche kangourou. Teinture vêtement. Fabriqué en Algérie.',
+    description: 'Hoodie 420 GSM coton mélangé, coupe cropped, capuche doublée, cordon de serrage, poche kangourou. Teinture vêtement. Édition Black : grand imprimé dos rose et blanc. Fabriqué en Algérie.',
     shortDescription: '420 GSM coton mélangé, coupe cropped, teinture vêtement',
     category: 'hoodies',
     basePrice: 5500,
     images: [
+      {
+        src: '/images/products/hoodie-cropped-black.webp',
+        alt: 'Hoodie Cropped Black — grand imprimé dos rose et blanc',
+        width: 1200,
+        height: 1500,
+      },
       placeholderImage('Hoodie Cropped Black', 1200, 1500),
       placeholderImage('Hoodie Cropped Gray', 1200, 1500),
       placeholderImage('Hoodie Cropped Navy', 1200, 1500),
     ],
     options: [createSizeOption(), createColorOption(['Black', 'Gray', 'Navy'])],
-    variants: createTeeVariants('hoodie-crop', 'Hoodie Cropped', 5500, ['Black', 'Gray', 'Navy']),
+    variants: createTeeVariants('hoodie-crop', 'Hoodie Cropped', 5500, ['Black', 'Gray', 'Navy']).map((v) =>
+      v.id === 'hoodie-crop-black'
+        ? { ...v, image: '/images/products/hoodie-cropped-black.webp' }
+        : v
+    ),
     featured: false,
     newArrival: false,
     tags: ['hoodies', 'cropped', 'heavyweight', 'garment-dyed'],
