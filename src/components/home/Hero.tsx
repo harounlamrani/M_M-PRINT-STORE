@@ -3,13 +3,14 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Particles } from '@/components/magicui/particles';
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" aria-labelledby="hero-title">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white" aria-labelledby="hero-title">
       <div className="absolute inset-0 z-0">
+        <Particles className="absolute inset-0" quantity={70} size={0.5} color="#0A0A0A" staticity={30} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-mm-red/10 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(10,10,10,0)_0%,_rgba(10,10,10,0.8)_100%)]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-mm-red/5 blur-3xl opacity-30 animate-pulse-slow" />
       </div>
 
@@ -25,7 +26,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-            className="text-display-xl font-chillax font-bold tracking-tight text-mm-white mb-6"
+            className="text-display-xl font-chillax font-bold tracking-tight text-mm-black mb-6"
           >
             M_M PRINT
             <br />
@@ -36,7 +37,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
-            className="text-body-lg text-mm-white/70 max-w-2xl mx-auto mb-10"
+            className="text-body-lg text-gray-600 max-w-2xl mx-auto mb-10"
           >
             Streetwear premium, impression locale, livraison partout en Algérie.
             Des pièces uniques pour ceux qui osent.
@@ -66,7 +67,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.5 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-body-sm text-mm-white/50"
+            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-body-sm text-gray-500"
           >
             <span className="flex items-center gap-2">
               <ShoppingBag className="h-4 w-4 text-mm-red" aria-hidden="true" />
@@ -95,7 +96,7 @@ export function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce-slow"
         aria-hidden="true"
       >
-        <svg className="h-6 w-6 text-mm-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="h-6 w-6 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
         </svg>
       </motion.div>
