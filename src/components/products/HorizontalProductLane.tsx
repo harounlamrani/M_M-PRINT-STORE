@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
 import { Product } from '@/lib/types';
 import { CategoryData } from '@/lib/types';
@@ -24,6 +25,12 @@ export function HorizontalProductLane({
   onOrderClick,
 }: HorizontalProductLaneProps) {
   const reduceMotion = useReducedMotion();
+  // Mounted guard: keep server + first client render identical so the
+  // style attribute never mismatches during hydration.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Flatten groups (respects the category filter from the parent) into one loop
   const items = productGroups.flatMap((group) => group.products);
@@ -52,7 +59,7 @@ export function HorizontalProductLane({
 
       <div className="relative">
         <motion.div
-          style={reduceMotion ? undefined : { skewX }}
+          style={mounted && !reduceMotion ? { skewX } : undefined}
           className="will-change-transform"
         >
           {/* Slow infinite loop: track slides 0 -> -50% and wraps.

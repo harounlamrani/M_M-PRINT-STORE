@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -30,9 +30,17 @@ export function MorphingText({
   const text1Ref = useRef<HTMLSpanElement>(null);
   const text2Ref = useRef<HTMLSpanElement>(null);
   const reduceMotion = useReducedMotion();
+  // Mounted guard: server + first client render must output the SAME markup
+  // (animated branch). Only after mount may we switch to the static variant,
+  // otherwise React throws a hydration "text content" mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const showStatic = mounted && reduceMotion;
 
   useEffect(() => {
-    if (reduceMotion || texts.length < 2) return;
+    if (showStatic || texts.length < 2) return;
     let textIndex = texts.length - 1;
     let morph = 0;
     let cooldown = cooldownTime;
@@ -89,10 +97,10 @@ export function MorphingText({
 
     animate();
     return () => cancelAnimationFrame(animationFrameId);
-  }, [texts, morphTime, cooldownTime, reduceMotion]);
+  }, [texts, morphTime, cooldownTime, showStatic]);
 
-  // Reduced motion (or a single word): static first word, no animation
-  if (reduceMotion || texts.length < 2) {
+  // Reduced motion (after mount only — see guard above): static first word
+  if (showStatic || texts.length < 2) {
     return (
       <span className={cn('inline-flex items-center whitespace-nowrap font-chillax font-bold leading-none', className)}>
         {texts[0]}

@@ -33,9 +33,17 @@ export function SparklesText({
 }: SparklesTextProps) {
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
   const reduceMotion = useReducedMotion();
+  // Mounted guard: server + first client render must output the SAME markup.
+  // Only after mount may we switch to the static variant, otherwise React
+  // throws a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const showStatic = mounted && reduceMotion;
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (showStatic) return;
 
     const generateStar = (): Sparkle => ({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -58,9 +66,9 @@ export function SparklesText({
     }, 100);
 
     return () => clearInterval(interval);
-  }, [colors.first, colors.second, sparklesCount, reduceMotion]);
+  }, [colors.first, colors.second, sparklesCount, showStatic]);
 
-  if (reduceMotion) {
+  if (showStatic) {
     return <span className={className}>{text}</span>;
   }
 
