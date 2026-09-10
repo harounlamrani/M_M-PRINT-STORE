@@ -1,103 +1,376 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ShoppingBag } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
-import { Particles } from '@/components/magicui/particles';
+import { getProductById } from '@/lib/products';
+import { getCategoryById } from '@/lib/categories';
+import { cn, formatPrice } from '@/lib/utils';
+import type { Product, ProductVariant } from '@/lib/types';
 
-export function Hero() {
+// Easing tuple typed for framer-motion v11 TS strictness.
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+interface GlowPreset {
+  x: string;
+  y: string;
+  s: number;
+  o: number;
+}
+
+interface ShowcaseEntry {
+  id: string;
+  product: Product;
+  variant: ProductVariant;
+  image: string;
+  imageAlt: string;
+  glow: GlowPreset;
+}
+
+interface EntryConfig {
+  id: string;
+  productId: string;
+  preferVariantId?: string;
+  preferColor?: string;
+  image: string;
+  imageAlt: string;
+  glow: GlowPreset;
+}
+
+const ENTRY_CONFIGS: EntryConfig[] = [
+  {
+    id: 'tshirts',
+    productId: 'tee-oversized',
+    preferVariantId: 'tee-ovs-charcoal',
+    preferColor: 'Charcoal',
+    image: '/images/categories/tshirts.jpg',
+    imageAlt: 'T-shirts blancs oversized portés',
+    glow: { x: '-28%', y: '-18%', s: 1.0, o: 0.9 },
+  },
+  {
+    id: 'ensembles',
+    productId: 'ens-tee-short',
+    preferVariantId: 'ens-ts-combo-0',
+    image: '/images/categories/ensembles.jpg',
+    imageAlt: 'Ensemble coordonné',
+    glow: { x: '26%', y: '-24%', s: 1.15, o: 1 },
+  },
+  {
+    id: 'hoodies',
+    productId: 'hoodie-cropped',
+    preferVariantId: 'hoodie-crop-black',
+    preferColor: 'Black',
+    image: '/images/products/hoodie-cropped-black.webp',
+    imageAlt: 'Hoodie noir à imprimé dos',
+    glow: { x: '0%', y: '8%', s: 1.05, o: 0.95 },
+  },
+  {
+    id: 'joggers',
+    productId: 'jogger-baggy',
+    preferColor: 'Black',
+    image: '/images/categories/joggers.jpg',
+    imageAlt: 'Joggers',
+    glow: { x: '-24%', y: '20%', s: 1.2, o: 1 },
+  },
+  {
+    id: 'bags',
+    productId: 'backpack',
+    preferColor: 'Black',
+    image: '/images/categories/bags.jpg',
+    imageAlt: 'Sac à dos porté',
+    glow: { x: '28%', y: '14%', s: 1.1, o: 0.9 },
+  },
+];
+
+function resolveVariant(product: Product, cfg: EntryConfig): ProductVariant | undefined {
+  if (cfg.preferVariantId) {
+    const byId = product.variants.find((v) => v.id === cfg.preferVariantId);
+    if (byId) return byId;
+  }
+  if (cfg.preferColor) {
+    const byColor = product.variants.find((v) => v.attributes?.color === cfg.preferColor);
+    if (byColor) return byColor;
+  }
+  return product.variants[0];
+}
+
+function buildEntries(): ShowcaseEntry[] {
+  const out: ShowcaseEntry[] = [];
+  for (const cfg of ENTRY_CONFIGS) {
+    const product = getProductById(cfg.productId);
+    if (!product) continue;
+    const variant = resolveVariant(product, cfg);
+    if (!variant) continue;
+    out.push({
+      id: cfg.id,
+      product,
+      variant,
+      image: cfg.image,
+      imageAlt: cfg.imageAlt,
+      glow: cfg.glow,
+    });
+  }
+  return out;
+}
+
+// Staggered info children: slide from left with blur.
+const infoChild: Variants = {
+  hidden: { opacity: 0, x: -28, filter: 'blur(6px)' },
+  show: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.45, ease: EASE } },
+  exit: { opacity: 0, x: 24, filter: 'blur(6px)', transition: { duration: 0.18, ease: EASE } },
+};
+
+interface HeroProps {
+  onOrderClick: (p: Product) => void;
+  orderOpen?: boolean;
+}
+
+export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
+  const reduce = useReducedMotion() === true;
+  const entries = useMemo(buildEntries, []);
+  const [index, setIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const safeIndex = entries.length === 0 ? 0 : Math.min(index, entries.length - 1);
+  const active = entries[safeIndex];
+
+  // Instant motion when reduced motion is preferred.
+  const infoChildVariants: Variants = useMemo(() => {
+    if (!reduce) return infoChild;
+    return {
+      hidden: { opacity: 0, x: -28, filter: 'blur(6px)' },
+      show: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0 } },
+      exit: { opacity: 0, x: 24, filter: 'blur(6px)', transition: { duration: 0 } },
+    };
+  }, [reduce]);
+
+  const infoParentVariants: Variants = useMemo(
+    () => ({
+      hidden: {},
+      show: { transition: { staggerChildren: reduce ? 0 : 0.09, duration: 0 } },
+      exit: { transition: { staggerChildren: 0, duration: 0 } },
+    }),
+    [reduce],
+  );
+
+  // Keep the active thumb visible (centered) in the scroll row.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !active) return;
+    const el = track.querySelector('[data-active="true"]');
+    if (el && typeof (el as HTMLElement).scrollIntoView === 'function') {
+      (el as HTMLElement).scrollIntoView({
+        inline: 'center',
+        block: 'nearest',
+        behavior: reduce ? 'auto' : 'smooth',
+      });
+    }
+  }, [safeIndex, active, reduce]);
+
+  if (!active) return null;
+
+  const glow = active.glow;
+  const categoryLabel = getCategoryById(active.product.category)?.label ?? active.product.category;
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  const scrollBy = (dx: number) => {
+    trackRef.current?.scrollBy({ left: dx, behavior: reduce ? 'auto' : 'smooth' });
+  };
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white" aria-labelledby="hero-title">
-      <div className="absolute inset-0 z-0">
-        <Particles className="absolute inset-0" quantity={70} size={0.5} color="#0A0A0A" staticity={30} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-mm-red/10 via-transparent to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-mm-red/5 blur-3xl opacity-30 animate-pulse-slow" />
-      </div>
-
-      <div className="relative z-10 container px-4 py-20">
+    <section
+      className="relative overflow-hidden bg-mm-black text-white min-h-svh"
+      aria-label="Collection à la une"
+    >
+      {/* Glow layer */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {/* Intense core */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="max-w-3xl text-center"
-        >
-          <motion.h1
-            id="hero-title"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-            className="text-display-xl font-chillax font-bold tracking-tight text-mm-black mb-6"
-          >
-            M_M PRINT
-            <br />
-            <span className="text-mm-red">STORE</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
-            className="text-body-lg text-gray-600 max-w-2xl mx-auto mb-10"
-          >
-            Streetwear premium, impression locale, livraison partout en Algérie.
-            Des pièces uniques pour ceux qui osent.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <a href="#tshirts" className="w-full sm:w-auto">
-              <InteractiveHoverButton className="w-full sm:w-auto">
-                Découvrir la collection
-              </InteractiveHoverButton>
-            </a>
-            <a href="#ensembles">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                Nos catégories
-              </Button>
-            </a>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-body-sm text-gray-500"
-          >
-            <span className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4 text-mm-red" aria-hidden="true" />
-              Livraison 58 wilayas
-            </span>
-            <span className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-mm-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              Paiement à la livraison
-            </span>
-            <span className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-mm-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Retour 14 jours
-            </span>
-          </motion.div>
-        </motion.div>
+          className="absolute left-1/2 top-1/2 w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] ml-[-190px] mt-[-190px] sm:ml-[-260px] sm:mt-[-260px] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(227,27,35,0.55) 0%, rgba(227,27,35,0.18) 45%, transparent 70%)',
+          }}
+          initial={false}
+          animate={{ x: glow.x, y: glow.y, scale: glow.s, opacity: glow.o }}
+          transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 48, damping: 20 }}
+        />
+        {/* Wide ambient (parallax lag) */}
+        <motion.div
+          className="absolute left-1/2 top-1/2 w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] ml-[-190px] mt-[-190px] sm:ml-[-260px] sm:mt-[-260px] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(227,27,35,0.35) 0%, rgba(227,27,35,0.10) 50%, transparent 72%)',
+          }}
+          initial={false}
+          animate={{ x: glow.x, y: glow.y, scale: glow.s * 1.6, opacity: glow.o * 0.35 }}
+          transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 30, damping: 22 }}
+        />
+        {/* Film grain */}
+        <div
+          className="absolute inset-0"
+          style={{
+            opacity: 0.07,
+            backgroundImage:
+              'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'160\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'2\'/%3E%3C/filter%3E%3Crect width=\'160\' height=\'160\' filter=\'url(%23n)\' opacity=\'0.6\'/%3E%3C/svg%3E")',
+          }}
+        />
       </div>
 
+      {/* Content (shifts when order panel opens) */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 1, ease: 'easeOut' }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce-slow"
-        aria-hidden="true"
+        className="relative flex min-h-svh flex-col justify-center"
+        initial={false}
+        animate={{
+          scale: orderOpen ? 0.97 : 1,
+          x: orderOpen ? -24 : 0,
+          opacity: orderOpen ? 0.75 : 1,
+        }}
+        transition={{ duration: reduce ? 0 : 0.4 }}
       >
-        <svg className="h-6 w-6 text-black/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 lg:pt-28 pb-12">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            {/* INFO */}
+            <div className="order-2 lg:order-1 min-w-0">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active.id}
+                  variants={infoParentVariants}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                >
+                  <motion.p
+                    variants={infoChildVariants}
+                    className="text-caption font-mono uppercase tracking-[0.2em] text-mm-red"
+                  >
+                    {categoryLabel}
+                  </motion.p>
+                  <motion.h1
+                    variants={infoChildVariants}
+                    className="text-display-md font-chillax font-bold mt-3"
+                  >
+                    {active.product.name}
+                  </motion.h1>
+                  {active.product.shortDescription ? (
+                    <motion.p variants={infoChildVariants} className="text-body-lg text-white/70 mt-4">
+                      {active.product.shortDescription}
+                    </motion.p>
+                  ) : null}
+                  <motion.p
+                    variants={infoChildVariants}
+                    className="text-heading-lg font-bold text-mm-red mt-5"
+                  >
+                    {formatPrice(active.variant.price)}
+                  </motion.p>
+                  <motion.div variants={infoChildVariants} className="mt-7">
+                    <Button
+                      size="lg"
+                      className="w-full sm:w-auto"
+                      onClick={() => onOrderClick(active.product)}
+                    >
+                      <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+                      Commander
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* VISUAL */}
+            <div className="order-1 lg:order-2 min-w-0">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active.id}
+                  initial={{ opacity: 0, x: 90, scale: 0.85 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -90, scale: 0.94 }}
+                  transition={{ duration: reduce ? 0 : 0.45, ease: reduce ? 'linear' : EASE }}
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(227,27,35,0.45)]">
+                    <Image
+                      src={active.image}
+                      alt={active.imageAlt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width:1024px) 100vw, 50vw"
+                      priority
+                    />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* SLIDER */}
+          <div className="mt-12">
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/50">Collection</p>
+              <p className="font-mono text-sm text-white/50" aria-live="polite">
+                {pad(safeIndex + 1)} / {pad(entries.length)}
+              </p>
+              <div className="hidden sm:flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="Produit précédent"
+                  onClick={() => scrollBy(-320)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-mm-red hover:text-mm-red"
+                >
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Produit suivant"
+                  onClick={() => scrollBy(320)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-mm-red hover:text-mm-red"
+                >
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={trackRef}
+              className="mt-4 flex gap-4 overflow-x-auto pb-2 snap-x scrollbar-hide"
+              role="listbox"
+              aria-label="Choisir un produit à la une"
+            >
+              {entries.map((entry, i) => {
+                const isActive = i === safeIndex;
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    role="option"
+                    aria-selected={isActive}
+                    aria-label={entry.product.name}
+                    data-active={isActive ? 'true' : 'false'}
+                    onClick={() => setIndex(i)}
+                    className={cn(
+                      'w-20 shrink-0 snap-start text-left transition',
+                      isActive ? 'ring-2 ring-mm-red ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100',
+                    )}
+                  >
+                    <span className="relative block h-24 w-full overflow-hidden rounded-lg border border-white/10">
+                      <Image
+                        src={entry.image}
+                        alt={entry.imageAlt}
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    </span>
+                    <span className="mt-1.5 block truncate text-[11px] text-white/60">
+                      {entry.product.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </motion.div>
     </section>
   );

@@ -35,7 +35,7 @@ export default function HomePage() {
     <div className="flex flex-col gap-0">
       <Header />
       {/* Hero - white background */}
-      <Hero />
+      <Hero onOrderClick={handleOrderClick} orderOpen={selectedProduct !== null} />
 
       {/* Categories Section - white background */}
       <CategorySection
