@@ -130,11 +130,28 @@ interface HeroProps {
 export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
   const reduce = useReducedMotion() === true;
   const entries = useMemo(buildEntries, []);
-  const [index, setIndex] = useState(0);
+  const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
+  void direction;
   const trackRef = useRef<HTMLDivElement>(null);
+  const suppressClickRef = useRef(false);
 
-  const safeIndex = entries.length === 0 ? 0 : Math.min(index, entries.length - 1);
-  const active = entries[safeIndex];
+  const count = entries.length;
+  const displayIndex = count === 0 ? 0 : ((page % count) + count) % count;
+  const active = entries[displayIndex] ?? entries[0];
+
+  const paginate = (dir: 1 | -1) => {
+    setPage([page + dir, dir]);
+  };
+
+  const goTo = (i: number) => {
+    const N = entries.length;
+    if (N === 0) return;
+    const cur = ((page % N) + N) % N;
+    const d = (((i - cur) % N) + N) % N;
+    if (d === 0) return;
+    const dir: 1 | -1 = d <= N / 2 ? 1 : -1;
+    setPage([page + (dir === 1 ? d : -(N - d)), dir]);
+  };
 
   // Instant motion when reduced motion is preferred.
   const infoChildVariants: Variants = useMemo(() => {
@@ -167,17 +184,13 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
         behavior: reduce ? 'auto' : 'smooth',
       });
     }
-  }, [safeIndex, active, reduce]);
+  }, [displayIndex, active, reduce]);
 
   if (!active) return null;
 
   const glow = active.glow;
   const categoryLabel = getCategoryById(active.product.category)?.label ?? active.product.category;
   const pad = (n: number) => String(n).padStart(2, '0');
-
-  const scrollBy = (dx: number) => {
-    trackRef.current?.scrollBy({ left: dx, behavior: reduce ? 'auto' : 'smooth' });
-  };
 
   return (
     <section
@@ -284,28 +297,93 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
               </AnimatePresence>
             </div>
 
-            {/* VISUAL — mobile: full-width capped at 340px, centered, padded */}
-            <div className="order-1 lg:order-2 min-w-0 mx-auto w-full max-w-[340px] px-2 sm:px-0 lg:max-w-none lg:px-0">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.id}
-                  initial={{ opacity: 0, x: 90, scale: 0.85 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -90, scale: 0.94 }}
-                  transition={{ duration: reduce ? 0 : 0.45, ease: reduce ? 'linear' : EASE }}
-                >
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(227,27,35,0.45)]">
-                      <Image
-                        src={active.image}
-                        alt={active.imageAlt}
-                        fill
-                        className="object-contain lg:object-cover"
-                        sizes="(max-width:1024px) 340px, 50vw"
-                        priority
-                      />
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+            {/* VISUAL — cinematic depth carousel stage */}
+            <div className="order-1 lg:order-2 min-w-0">
+              <motion.div
+                className="relative h-[400px] sm:h-[500px] lg:h-[560px] cursor-grab active:cursor-grabbing"
+                aria-roledescription="carousel"
+                aria-label="Produits à la une"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.12}
+                dragMomentum={false}
+                onDragStart={() => {
+                  suppressClickRef.current = true;
+                }}
+                onDragEnd={(_event, info) => {
+                  const offsetX = info.offset.x;
+                  const velocityX = info.velocity.x;
+                  if (offsetX < -70 || velocityX < -600) {
+                    paginate(1);
+                  } else if (offsetX > 70 || velocityX > 600) {
+                    paginate(-1);
+                  } else {
+                    suppressClickRef.current = false;
+                  }
+                }}
+              >
+                {entries.map((entry, i) => {
+                  const N = entries.length;
+                  let r = N === 0 ? 0 : (((i - page) % N) + N) % N;
+                  if (r > N / 2) r -= N;
+                  const abs = Math.abs(r);
+                  const isActive = r === 0;
+                  const isAdjacent = abs === 1;
+                  const x = isActive
+                    ? '0%'
+                    : isAdjacent
+                      ? `${r > 0 ? '' : '-'}85%`
+                      : `${r >= 0 ? '' : '-'}150%`;
+                  return (
+                    <div
+                      key={entry.id}
+                      className="absolute left-1/2 top-1/2 w-[74%] sm:w-[60%] lg:w-[64%] aspect-[4/5] -translate-x-1/2 -translate-y-1/2"
+                      style={{ zIndex: isActive ? 10 : isAdjacent ? 5 : 0 }}
+                    >
+                      <motion.button
+                        type="button"
+                        aria-label={`Voir ${entry.product.name}`}
+                        initial={false}
+                        animate={{
+                          x,
+                          scale: isActive ? 1 : isAdjacent ? 1.22 : 1.3,
+                          opacity: isActive ? 1 : isAdjacent ? 0.5 : 0,
+                          filter: isActive
+                            ? 'blur(0px) brightness(1)'
+                            : isAdjacent
+                              ? 'blur(3px) brightness(0.55)'
+                              : 'blur(8px) brightness(0.4)',
+                        }}
+                        transition={{ type: 'tween', duration: reduce ? 0 : 0.85, ease: EASE }}
+                        style={abs >= 2 ? { pointerEvents: 'none' } : undefined}
+                        onClick={() => {
+                          if (suppressClickRef.current) {
+                            suppressClickRef.current = false;
+                            return;
+                          }
+                          if (isActive) return;
+                          if (isAdjacent) goTo(i);
+                        }}
+                        className={cn(
+                          'h-full w-full text-left',
+                          isAdjacent ? 'cursor-pointer' : 'cursor-default',
+                        )}
+                      >
+                        <span className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(227,27,35,0.45)]">
+                          <Image
+                            src={entry.image}
+                            alt={entry.imageAlt}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width:640px) 74vw, (max-width:1024px) 60vw, 40vw"
+                            priority={i === 0}
+                          />
+                        </span>
+                      </motion.button>
+                    </div>
+                  );
+                })}
+              </motion.div>
             </div>
           </div>
 
@@ -314,13 +392,13 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
             <div className="flex items-center justify-between gap-4">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-white/50">Collection</p>
               <p className="font-mono text-sm text-white/50" aria-live="polite">
-                {pad(safeIndex + 1)} / {pad(entries.length)}
+                {pad(displayIndex + 1)} / {pad(entries.length)}
               </p>
               <div className="hidden sm:flex items-center gap-2">
                 <button
                   type="button"
                   aria-label="Produit précédent"
-                  onClick={() => scrollBy(-320)}
+                  onClick={() => paginate(-1)}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-mm-red hover:text-mm-red"
                 >
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -328,7 +406,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 <button
                   type="button"
                   aria-label="Produit suivant"
-                  onClick={() => scrollBy(320)}
+                  onClick={() => paginate(1)}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-mm-red hover:text-mm-red"
                 >
                   <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -343,7 +421,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
               aria-label="Choisir un produit à la une"
             >
               {entries.map((entry, i) => {
-                const isActive = i === safeIndex;
+                const isActive = i === displayIndex;
                 return (
                   <button
                     key={entry.id}
@@ -352,7 +430,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                     aria-selected={isActive}
                     aria-label={entry.product.name}
                     data-active={isActive ? 'true' : 'false'}
-                    onClick={() => setIndex(i)}
+                    onClick={() => goTo(i)}
                     className={cn(
                       'w-20 shrink-0 snap-start text-left transition',
                       isActive ? 'ring-2 ring-mm-red ring-offset-2 ring-offset-black' : 'opacity-60 hover:opacity-100',
