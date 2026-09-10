@@ -184,30 +184,35 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
       className="relative overflow-hidden bg-mm-black text-white min-h-svh"
       aria-label="Collection à la une"
     >
-      {/* Glow layer */}
+      {/* Glow layer — centered wrappers (static transforms) + motion inner boxes.
+          No negative margins/positions; overflow stays clipped by the section. */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {/* Intense core */}
-        <motion.div
-          className="absolute left-1/2 top-1/2 w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] ml-[-190px] mt-[-190px] sm:ml-[-260px] sm:mt-[-260px] rounded-full blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(227,27,35,0.55) 0%, rgba(227,27,35,0.18) 45%, transparent 70%)',
-          }}
-          initial={false}
-          animate={{ x: glow.x, y: glow.y, scale: glow.s, opacity: glow.o }}
-          transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 48, damping: 20 }}
-        />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <motion.div
+            className="h-[300px] w-[300px] rounded-full blur-3xl sm:h-[520px] sm:w-[520px]"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(227,27,35,0.55) 0%, rgba(227,27,35,0.18) 45%, transparent 70%)',
+            }}
+            initial={false}
+            animate={{ x: glow.x, y: glow.y, scale: glow.s, opacity: glow.o }}
+            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 48, damping: 20 }}
+          />
+        </div>
         {/* Wide ambient (parallax lag) */}
-        <motion.div
-          className="absolute left-1/2 top-1/2 w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] ml-[-190px] mt-[-190px] sm:ml-[-260px] sm:mt-[-260px] rounded-full blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(227,27,35,0.35) 0%, rgba(227,27,35,0.10) 50%, transparent 72%)',
-          }}
-          initial={false}
-          animate={{ x: glow.x, y: glow.y, scale: glow.s * 1.6, opacity: glow.o * 0.35 }}
-          transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 30, damping: 22 }}
-        />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <motion.div
+            className="h-[300px] w-[300px] rounded-full blur-3xl sm:h-[520px] sm:w-[520px]"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(227,27,35,0.35) 0%, rgba(227,27,35,0.10) 50%, transparent 72%)',
+            }}
+            initial={false}
+            animate={{ x: glow.x, y: glow.y, scale: glow.s * 1.6, opacity: glow.o * 0.35 }}
+            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 30, damping: 22 }}
+          />
+        </div>
         {/* Film grain */}
         <div
           className="absolute inset-0"
@@ -250,12 +255,12 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                   </motion.p>
                   <motion.h1
                     variants={infoChildVariants}
-                    className="text-display-md font-chillax font-bold mt-3"
+                    className="text-display-md font-chillax font-bold mt-3 break-words"
                   >
                     {active.product.name}
                   </motion.h1>
                   {active.product.shortDescription ? (
-                    <motion.p variants={infoChildVariants} className="text-body-lg text-white/70 mt-4">
+                    <motion.p variants={infoChildVariants} className="text-body-lg text-white/70 mt-4 break-words">
                       {active.product.shortDescription}
                     </motion.p>
                   ) : null}
@@ -279,8 +284,8 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
               </AnimatePresence>
             </div>
 
-            {/* VISUAL */}
-            <div className="order-1 lg:order-2 min-w-0">
+            {/* VISUAL — mobile: full-width capped at 340px, centered, padded */}
+            <div className="order-1 lg:order-2 min-w-0 mx-auto w-full max-w-[340px] px-2 sm:px-0 lg:max-w-none lg:px-0">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.id}
@@ -290,14 +295,14 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                   transition={{ duration: reduce ? 0 : 0.45, ease: reduce ? 'linear' : EASE }}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(227,27,35,0.45)]">
-                    <Image
-                      src={active.image}
-                      alt={active.imageAlt}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width:1024px) 100vw, 50vw"
-                      priority
-                    />
+                      <Image
+                        src={active.image}
+                        alt={active.imageAlt}
+                        fill
+                        className="object-contain lg:object-cover"
+                        sizes="(max-width:1024px) 340px, 50vw"
+                        priority
+                      />
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -333,7 +338,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
 
             <div
               ref={trackRef}
-              className="mt-4 flex gap-4 overflow-x-auto pb-2 snap-x scrollbar-hide"
+              className="mt-4 flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
               role="listbox"
               aria-label="Choisir un produit à la une"
             >
