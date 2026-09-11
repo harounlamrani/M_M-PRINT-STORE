@@ -235,11 +235,11 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
         }}
         transition={{ duration: reduce ? 0 : 0.4 }}
       >
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 lg:pt-28 pb-12">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-28 pb-8 lg:pb-12">
           {/* STAGE */}
           <div className="relative">
             <motion.div
-              className="relative h-[420px] sm:h-[500px] lg:h-[600px] cursor-grab active:cursor-grabbing"
+              className="relative h-[320px] [@media(max-height:700px)]:h-[280px] sm:h-[520px] lg:h-[620px] cursor-grab active:cursor-grabbing"
               aria-roledescription="carousel"
               aria-label="Produits à la une"
               drag="x"
@@ -275,7 +275,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 return (
                   <div
                     key={entry.id}
-                    className="absolute left-1/2 top-1/2 w-[72%] sm:w-[56%] lg:w-[38%] aspect-[4/5] -translate-x-1/2 -translate-y-1/2"
+                    className="absolute left-1/2 top-1/2 w-[72%] [@media(max-height:700px)]:w-[64%] sm:w-[46%] lg:w-[42%] aspect-[4/5] -translate-x-1/2 -translate-y-1/2"
                     style={{ zIndex: isCenter ? 10 : isSide ? 5 : 0 }}
                   >
                     <motion.button
@@ -313,7 +313,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                           alt={entry.imageAlt}
                           fill
                           className="object-cover"
-                          sizes="(max-width:640px) 72vw, (max-width:1024px) 56vw, 38vw"
+                          sizes="(max-width:640px) 72vw, (max-width:1024px) 46vw, 42vw"
                           priority={i === 0}
                         />
                       </span>
@@ -343,7 +343,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
           </div>
 
           {/* Indicators */}
-          <div className="mt-5 flex justify-center gap-2">
+          <div className="mt-4 sm:mt-5 flex justify-center gap-2">
             {entries.map((entry, i) => {
               const isActive = i === display;
               return (
@@ -362,7 +362,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
           </div>
 
           {/* INFO — centered single column */}
-          <div className="mx-auto mt-8 max-w-2xl text-center">
+          <div className="mx-auto mt-5 sm:mt-8 max-w-2xl text-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active.id}
@@ -379,7 +379,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 </motion.p>
                 <motion.h1
                   variants={infoChildVariants}
-                  className="text-display-md font-chillax font-bold mt-3 break-words"
+                  className="text-[clamp(1.6rem,7vw,3rem)] font-chillax font-bold mt-2 sm:mt-3 break-words"
                 >
                   {active.product.name}
                 </motion.h1>
@@ -393,11 +393,11 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 ) : null}
                 <motion.p
                   variants={infoChildVariants}
-                  className="text-heading-lg font-bold text-mm-red mt-5"
+                  className="text-heading-lg font-bold text-mm-red mt-4 sm:mt-5"
                 >
                   {formatPrice(active.variant.price)}
                 </motion.p>
-                <motion.div variants={infoChildVariants} className="mt-7 flex justify-center">
+                <motion.div variants={infoChildVariants} className="mt-5 sm:mt-7 flex justify-center">
                   <Button
                     size="lg"
                     className="w-full sm:w-auto"
