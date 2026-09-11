@@ -263,7 +263,52 @@ export const products: Product[] = [
     },
   },
 
-  // HOODIES CATEGORY (placeholder - no products yet)
+  // ENSEMBLES CATEGORY - Script edition (own product card)
+  {
+    id: 'ens-tee-short-script',
+    slug: 'ensemble-tee-short-script',
+    name: 'Ensemble T-Shirt + Short Script',
+    description: 'T-Shirt 280 GSM (coupe Regular) + Short 320 GSM French Terry. Grand imprimé script poitrine et jambe — noir sur le set blanc, blanc contour sur le set noir. Taille élastique avec cordon, poches latérales, poche arrière zippée. Inseam 7". Ensemble vendu complet.',
+    shortDescription: 'Tee 280 GSM + Short 320 GSM, grand imprimé script',
+    category: 'ensembles',
+    basePrice: 4500,
+    images: [
+      {
+        src: '/images/products/ensemble-tee-short-script-white.png',
+        alt: 'Ensemble T-Shirt + Short Script blanc — imprimé script noir',
+        width: 1200,
+        height: 1500,
+      },
+      {
+        src: '/images/products/ensemble-tee-short-script-black.png',
+        alt: 'Ensemble T-Shirt + Short Script noir — imprimé script blanc contour',
+        width: 1200,
+        height: 1500,
+      },
+    ],
+    options: [
+      createSizeOption(),
+      { name: 'combo', label: 'Combinaison', type: 'variant', values: ['White/White', 'Black/Black'], required: true },
+    ],
+    variants: createEnsembleVariants('ens-ss', 'Ensemble Tee Short Script', [
+      { top: 'White', bottom: 'White' },
+      { top: 'Black', bottom: 'Black' },
+    ]).map((v) => ({
+      ...v,
+      image:
+        v.id === 'ens-ss-combo-0'
+          ? '/images/products/ensemble-tee-short-script-white.png'
+          : '/images/products/ensemble-tee-short-script-black.png',
+    })),
+    featured: true,
+    newArrival: true,
+    tags: ['ensembles', 'set', 'tee', 'short', 'script-print', 'matched'],
+    seo: {
+      title: 'Ensemble T-Shirt + Short Script — M_M PRINT STORE',
+      description: 'Ensemble coordonné Tee 280 GSM + Short 320 GSM, grand imprimé script poitrine et jambe.',
+    },
+  },
+  // HOODIES CATEGORY
   {
     id: 'hoodie-cropped',
     slug: 'hoodie-cropped',

@@ -16,7 +16,7 @@ export const categories: CategoryData[] = [
     labelAr: 'أطقم',
     description: 'Sets coordonnés tee-shirt + bas',
     image: '/images/categories/ensembles.jpg',
-    productCount: 3,
+    productCount: 4,
     href: '#ensembles',
   },
   {
