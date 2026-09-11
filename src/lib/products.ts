@@ -279,14 +279,14 @@ export const products: Product[] = [
     basePrice: 4500,
     images: [
       {
-        src: '/images/products/ensemble-tee-short-script-white.png',
-        alt: 'Ensemble T-Shirt + Short Script blanc — imprimé script noir',
+        src: '/images/products/ensemble-tee-short-script-black.png',
+        alt: 'Ensemble T-Shirt + Short Script noir — imprimé script blanc contour',
         width: 1200,
         height: 1500,
       },
       {
-        src: '/images/products/ensemble-tee-short-script-black.png',
-        alt: 'Ensemble T-Shirt + Short Script noir — imprimé script blanc contour',
+        src: '/images/products/ensemble-tee-short-script-white.png',
+        alt: 'Ensemble T-Shirt + Short Script blanc — imprimé script noir',
         width: 1200,
         height: 1500,
       },

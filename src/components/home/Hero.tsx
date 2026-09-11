@@ -64,8 +64,8 @@ const ENTRY_CONFIGS: EntryConfig[] = [
   },
   {
     productId: 'ens-tee-short-script',
-    image: '/images/products/ensemble-tee-short-script-white.png',
-    preferVariantId: 'ens-ss-combo-0',
+    image: '/images/products/ensemble-tee-short-script-black.png',
+    preferVariantId: 'ens-ss-combo-1',
   },
   {
     productId: 'hoodie-cropped',
