@@ -31,88 +31,84 @@ interface ShowcaseEntry {
 }
 
 interface EntryConfig {
-  id: string;
   productId: string;
+  image: string;
   preferVariantId?: string;
   preferColor?: string;
-  image: string;
-  imageAlt: string;
-  glow: GlowPreset;
 }
 
+// Depth filters — function ORDER identical (brightness first, then drop-shadow)
+// so framer-motion can interpolate the lists. Far has brightness only per spec.
+const FILTER_CENTER = 'brightness(1) drop-shadow(0 24px 48px rgba(227,27,35,0.35))';
+const FILTER_SIDE = 'brightness(0.65) drop-shadow(0 16px 32px rgba(0,0,0,0.6))';
+  const FILTER_FAR = 'brightness(0.5) drop-shadow(0 0px 0px rgba(0,0,0,0))'; // zero shadow = invisible, keeps list interpolable
+
+// 5-preset glow mechanism (preserved); cycled by entry index since entries are products now.
+const GLOW_PRESETS: GlowPreset[] = [
+  { x: '14%', y: '-18%', s: 1.0, o: 0.9 },
+  { x: '0%', y: '-24%', s: 1.15, o: 1 },
+  { x: '-14%', y: '8%', s: 1.05, o: 0.95 },
+  { x: '8%', y: '20%', s: 1.2, o: 1 },
+  { x: '-8%', y: '14%', s: 1.1, o: 0.9 },
+];
+
+// One entry per REAL product with a real on-disk photo (products.ts order).
+// Display image rule: (1) new transparent PNG matching the product,
+// else (2) existing real on-disk image already referenced by that product.
 const ENTRY_CONFIGS: EntryConfig[] = [
   {
-    id: 'tshirts',
     productId: 'tee-oversized',
-    preferVariantId: 'tee-ovs-charcoal',
-    preferColor: 'Charcoal',
-    image: '/images/categories/tshirts.jpg',
-    imageAlt: 'T-shirts blancs oversized portés',
-    glow: { x: '14%', y: '-18%', s: 1.0, o: 0.9 },
+    image: '/images/products/t-shirt-oversized-white.png',
+    preferVariantId: 'tee-ovs-white',
+    preferColor: 'White',
   },
   {
-    id: 'ensembles',
-    productId: 'ens-tee-short',
-    preferVariantId: 'ens-ts-combo-0',
-    image: '/images/categories/ensembles.jpg',
-    imageAlt: 'Ensemble coordonné',
-    glow: { x: '0%', y: '-24%', s: 1.15, o: 1 },
+    productId: 'ens-tee-short-script',
+    image: '/images/products/ensemble-tee-short-script-white.png',
+    preferVariantId: 'ens-ss-combo-0',
   },
   {
-    id: 'hoodies',
     productId: 'hoodie-cropped',
+    image: '/images/products/hoodie-cropped-black.webp',
     preferVariantId: 'hoodie-crop-black',
     preferColor: 'Black',
-    image: '/images/products/hoodie-cropped-black.webp',
-    imageAlt: 'Hoodie noir à imprimé dos',
-    glow: { x: '-14%', y: '8%', s: 1.05, o: 0.95 },
-  },
-  {
-    id: 'joggers',
-    productId: 'jogger-baggy',
-    preferColor: 'Black',
-    image: '/images/categories/joggers.jpg',
-    imageAlt: 'Joggers',
-    glow: { x: '8%', y: '20%', s: 1.2, o: 1 },
-  },
-  {
-    id: 'bags',
-    productId: 'backpack',
-    preferColor: 'Black',
-    image: '/images/categories/bags.jpg',
-    imageAlt: 'Sac à dos porté',
-    glow: { x: '-8%', y: '14%', s: 1.1, o: 0.9 },
   },
 ];
 
 function resolveVariant(product: Product, cfg: EntryConfig): ProductVariant | undefined {
+  // (1) Variant whose image is the chosen display image.
+  const byImage = product.variants.find((v) => v.image === cfg.image);
+  if (byImage) return byImage;
+  // Prefer explicit variant id (same as image match for these entries).
   if (cfg.preferVariantId) {
     const byId = product.variants.find((v) => v.id === cfg.preferVariantId);
     if (byId) return byId;
   }
+  // (2) Variant whose color matches the photo.
   if (cfg.preferColor) {
     const byColor = product.variants.find((v) => v.attributes?.color === cfg.preferColor);
     if (byColor) return byColor;
   }
+  // (3) Fallback.
   return product.variants[0];
 }
 
 function buildEntries(): ShowcaseEntry[] {
   const out: ShowcaseEntry[] = [];
-  for (const cfg of ENTRY_CONFIGS) {
+  ENTRY_CONFIGS.forEach((cfg, i) => {
     const product = getProductById(cfg.productId);
-    if (!product) continue;
+    if (!product) return;
     const variant = resolveVariant(product, cfg);
-    if (!variant) continue;
+    if (!variant) return;
     out.push({
-      id: cfg.id,
+      id: product.id,
       product,
       variant,
       image: cfg.image,
-      imageAlt: cfg.imageAlt,
-      glow: cfg.glow,
+      imageAlt: `${product.name}`,
+      glow: GLOW_PRESETS[i % GLOW_PRESETS.length] as GlowPreset,
     });
-  }
+  });
   return out;
 }
 
@@ -308,11 +304,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                         x,
                         scale: isCenter ? 1 : isSide ? 0.72 : 0.8,
                         opacity: isCenter ? 1 : isSide ? 0.5 : 0,
-                        filter: isCenter
-                          ? 'brightness(1)'
-                          : isSide
-                            ? 'brightness(0.65)'
-                            : 'brightness(0.5)',
+                        filter: isCenter ? FILTER_CENTER : isSide ? FILTER_SIDE : FILTER_FAR,
                       }}
                       transition={{ type: 'tween', duration: reduce ? 0 : 0.8, ease: EASE }}
                       style={abs >= 2 ? { pointerEvents: 'none' } : undefined}
@@ -329,12 +321,12 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                         isSide ? 'cursor-pointer' : 'cursor-default',
                       )}
                     >
-                      <span className="relative block h-full w-full overflow-hidden rounded-xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(227,27,35,0.45)]">
+                      <span className="relative block h-full w-full">
                         <Image
                           src={entry.image}
-                          alt={entry.imageAlt}
+                          alt={entry.product.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           sizes="(max-width:640px) 68vw, (max-width:1024px) 46vw, 38vw"
                           priority={i === 0}
                         />
