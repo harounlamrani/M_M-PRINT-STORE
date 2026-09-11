@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { MoltenMetal } from '@/components/effects/molten-metal';
 import { Button } from '@/components/ui/Button';
 import { getProductById } from '@/lib/products';
 import { getCategoryById } from '@/lib/categories';
@@ -187,6 +188,27 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
       {/* Glow layer — centered wrappers (static transforms) + motion inner boxes.
           No negative margins/positions; overflow stays clipped by the section. */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <MoltenMetal
+          color1="#E31B23"
+          color2="#E31B23"
+          color3="#FFFFFF"
+          speed={0.35}
+          scale={4}
+          detail={3}
+          glow={1.6}
+          coreSize={0.1}
+          swirl={1}
+          fold={-0.2}
+          blackPoint={0.05}
+          brightness={1.3}
+          colorMode="molten"
+          grain
+          grainIntensity={0.05}
+          mouseInteraction
+          mouseStrength={0.3}
+          opacity={0.9}
+          className="absolute inset-0"
+        />
         {/* Intense core */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.div
