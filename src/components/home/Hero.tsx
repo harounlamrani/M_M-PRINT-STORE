@@ -235,11 +235,11 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
         }}
         transition={{ duration: reduce ? 0 : 0.4 }}
       >
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-28 pb-8 lg:pb-12">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 lg:pt-24 pb-8 lg:pb-12">
           {/* STAGE */}
           <div className="relative">
-            <motion.div
-              className="relative h-[320px] [@media(max-height:700px)]:h-[280px] sm:h-[520px] lg:h-[620px] cursor-grab active:cursor-grabbing"
+              <motion.div
+                className="relative h-[300px] [@media(max-height:700px)]:h-[280px] sm:h-[520px] lg:h-[560px] cursor-grab active:cursor-grabbing"
               aria-roledescription="carousel"
               aria-label="Produits à la une"
               drag="x"
@@ -275,7 +275,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 return (
                   <div
                     key={entry.id}
-                    className="absolute left-1/2 top-1/2 w-[72%] [@media(max-height:700px)]:w-[64%] sm:w-[46%] lg:w-[42%] aspect-[4/5] -translate-x-1/2 -translate-y-1/2"
+                      className="absolute left-1/2 top-1/2 w-[68%] [@media(max-height:700px)]:w-[64%] sm:w-[46%] lg:w-[38%] aspect-[4/5] -translate-x-1/2 -translate-y-1/2"
                     style={{ zIndex: isCenter ? 10 : isSide ? 5 : 0 }}
                   >
                     <motion.button
@@ -313,7 +313,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                           alt={entry.imageAlt}
                           fill
                           className="object-cover"
-                          sizes="(max-width:640px) 72vw, (max-width:1024px) 46vw, 42vw"
+                          sizes="(max-width:640px) 68vw, (max-width:1024px) 46vw, 38vw"
                           priority={i === 0}
                         />
                       </span>
@@ -361,8 +361,8 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
             })}
           </div>
 
-          {/* INFO — centered single column */}
-          <div className="mx-auto mt-5 sm:mt-8 max-w-2xl text-center">
+          {/* INFO — centered single column, stable reserved space */}
+          <div className="mx-auto mt-5 sm:mt-8 max-w-2xl text-center min-h-[240px] sm:min-h-[260px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active.id}
@@ -386,7 +386,7 @@ export function Hero({ onOrderClick, orderOpen = false }: HeroProps) {
                 {active.product.shortDescription ? (
                   <motion.p
                     variants={infoChildVariants}
-                    className="text-body-lg text-white/70 mt-4 break-words"
+                    className="text-body-lg text-white/70 mt-4 break-words max-w-md mx-auto"
                   >
                     {active.product.shortDescription}
                   </motion.p>
