@@ -382,7 +382,7 @@ seo: {
     category: 'joggers',
     basePrice: 4500,
     images: [
-      { src: '/images/products/stussy-1.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
+      { src: '/images/products/STUSSY 1.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
     ],
     options: [createSizeOption(), createColorOption(['Noir', 'Blanc'])],
     variants: [
@@ -406,7 +406,7 @@ seo: {
     category: 'joggers',
     basePrice: 4500,
     images: [
-      { src: '/images/products/puma-1.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
+      { src: '/images/products/PUMA 1.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
     ],
     options: [createSizeOption(), createColorOption(['Noir', 'Blanc'])],
     variants: [
