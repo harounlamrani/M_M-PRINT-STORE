@@ -63,15 +63,14 @@ const ENTRY_CONFIGS: EntryConfig[] = [
     preferColor: 'White',
   },
   {
-    productId: 'ens-tee-short-script',
-    image: '/images/products/ensemble-tee-short-script-black.png',
-    preferVariantId: 'ens-ss-combo-1',
+    productId: 'jogging-oversize-stussy',
+    image: '/images/products/stussy-1.webp',
+    preferVariantId: 'jos-ss-black',
   },
   {
-    productId: 'hoodie-cropped',
-    image: '/images/products/hoodie-cropped-black.webp',
-    preferVariantId: 'hoodie-crop-black',
-    preferColor: 'Black',
+    productId: 'jogging-oversize-puma',
+    image: '/images/products/puma-1.webp',
+    preferVariantId: 'jos-pm-black',
   },
 ];
 

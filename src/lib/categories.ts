@@ -34,7 +34,7 @@ export const categories: CategoryData[] = [
     labelAr: 'جوفرات',
     description: 'Joggers à coupe baggy',
     image: '/images/categories/joggers.jpg',
-    productCount: 0,
+    productCount: 3,
     href: '#joggers',
   },
   {

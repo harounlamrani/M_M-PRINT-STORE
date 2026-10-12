@@ -383,11 +383,8 @@ seo: {
     basePrice: 4500,
     images: [
       { src: '/images/products/stussy-1.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
-      { src: '/images/products/stussy-2.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
-      { src: '/images/products/stussy-3.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
-      { src: '/images/products/stussy-4.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
     ],
-    options: [createSizeOption(), createColorOption(['Noir'])],
+    options: [createSizeOption(), createColorOption(['Noir', 'Blanc'])],
     variants: [
       { id: 'jos-ss-black', name: 'Noir', sku: 'JOS-SS-BLK', price: 4500, attributes: { size: 'S', color: 'Noir', cut: 'Oversized' }, stock: 20 },
       { id: 'jos-ss-white', name: 'Blanc', sku: 'JOS-SS-WHT', price: 4500, attributes: { size: 'S', color: 'Blanc', cut: 'Oversized' }, stock: 20 },
@@ -410,10 +407,8 @@ seo: {
     basePrice: 4500,
     images: [
       { src: '/images/products/puma-1.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
-      { src: '/images/products/puma-2.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
-      { src: '/images/products/puma-3.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
     ],
-    options: [createSizeOption(), createColorOption(['Noir'])],
+    options: [createSizeOption(), createColorOption(['Noir', 'Blanc'])],
     variants: [
       { id: 'jos-pm-black', name: 'Noir', sku: 'JOS-PM-BLK', price: 4500, attributes: { size: 'S', color: 'Noir', cut: 'Oversized' }, stock: 20 },
       { id: 'jos-pm-white', name: 'Blanc', sku: 'JOS-PM-WHT', price: 4500, attributes: { size: 'S', color: 'Blanc', cut: 'Oversized' }, stock: 20 },
