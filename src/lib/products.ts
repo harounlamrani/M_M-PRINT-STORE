@@ -367,12 +367,65 @@ export const products: Product[] = [
     featured: false,
     newArrival: false,
     tags: ['joggers', 'baggy', 'french-terry', 'garment-dyed'],
-    seo: {
+seo: {
       title: 'Jogger Baggy — M_M PRINT STORE',
       description: 'Jogger 320 GSM French Terry coupe baggy, teinture coordonnée. Fabriqué en Algérie.',
     },
   },
-
+  // JOGGING OVERSIZE CATEGORY - 2 new products
+  {
+    id: 'jogging-oversize-stussy',
+    slug: 'jogging-oversize-stussy',
+    name: 'Jogging Oversize Noir – Stüssy',
+    description: 'Jogging 320 GSM French Terry, coupe oversized très ample, taille élastique avec cordon, chevilles élastiquées, poches latérales, poche arrière zippée. Teinture vêtement. Modèle Saint Laurent inspired.',
+    shortDescription: 'Jogging 320 GSM French Terry, coupe oversized',
+    category: 'joggers',
+    basePrice: 4500,
+    images: [
+      { src: '/images/products/stussy-1.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
+      { src: '/images/products/stussy-2.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
+      { src: '/images/products/stussy-3.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
+      { src: '/images/products/stussy-4.webp', alt: 'Jogging Oversize Noir – Stüssy', width: 1200, height: 1500 },
+    ],
+    options: [createSizeOption(), createColorOption(['Noir'])],
+    variants: [
+      { id: 'jos-ss-black', name: 'Noir', sku: 'JOS-SS-BLK', price: 4500, attributes: { size: 'S', color: 'Noir', cut: 'Oversized' }, stock: 20 },
+      { id: 'jos-ss-white', name: 'Blanc', sku: 'JOS-SS-WHT', price: 4500, attributes: { size: 'S', color: 'Blanc', cut: 'Oversized' }, stock: 20 },
+    ],
+    featured: true,
+    newArrival: true,
+    tags: ['joggers', 'oversized', 'noir', 'stussy', 'inspired'],
+    seo: {
+      title: 'Jogging Oversize Noir – Stüssy — M_M PRINT STORE',
+      description: 'Jogging 320 GSM French Terry coupe oversized, teinture vêtement. Fabriqué en Algérie.',
+    },
+  },
+  {
+    id: 'jogging-oversize-puma',
+    slug: 'jogging-oversize-puma',
+    name: 'Jogging Oversize Noir – puma',
+    description: 'Jogging 320 GSM French Terry, coupe oversized très ample, taille élastique avec cordon, chevilles élastiquées, poches latérales, poche arrière zippée. Teinture vêtement. Modèle puma inspired.',
+    shortDescription: 'Jogging 320 GSM French Terry, coupe oversized',
+    category: 'joggers',
+    basePrice: 4500,
+    images: [
+      { src: '/images/products/puma-1.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
+      { src: '/images/products/puma-2.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
+      { src: '/images/products/puma-3.webp', alt: 'Jogging Oversize Noir – puma', width: 1200, height: 1500 },
+    ],
+    options: [createSizeOption(), createColorOption(['Noir'])],
+    variants: [
+      { id: 'jos-pm-black', name: 'Noir', sku: 'JOS-PM-BLK', price: 4500, attributes: { size: 'S', color: 'Noir', cut: 'Oversized' }, stock: 20 },
+      { id: 'jos-pm-white', name: 'Blanc', sku: 'JOS-PM-WHT', price: 4500, attributes: { size: 'S', color: 'Blanc', cut: 'Oversized' }, stock: 20 },
+    ],
+    featured: true,
+    newArrival: true,
+    tags: ['joggers', 'oversized', 'noir', 'puma', 'inspired'],
+    seo: {
+      title: 'Jogging Oversize Noir – puma — M_M PRINT STORE',
+      description: 'Jogging 320 GSM French Terry coupe oversized, teinture vêtement. Fabriqué en Algérie.',
+    },
+  },
   // SAC À DOS CATEGORY
   {
     id: 'backpack',
