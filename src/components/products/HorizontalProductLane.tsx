@@ -109,12 +109,14 @@ export function HorizontalProductLane({
                     key={`${product.id}-c${copy}`}
                     className="w-72 flex-shrink-0 sm:w-80"
                   >
-                    <ProductCard
+<ProductCard
                       product={product}
                       index={productIndex}
                       variant="compact"
                       onOrderClick={onOrderClick}
-                    />
+                      showImage={false}
+                      showName={false}
+/>
                   </div>
                 ))}
               </div>
