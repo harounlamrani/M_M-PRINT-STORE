@@ -55,24 +55,7 @@ const GLOW_PRESETS: GlowPreset[] = [
 // One entry per REAL product with a real on-disk photo (products.ts order).
 // Display image rule: (1) new transparent PNG matching the product,
 // else (2) existing real on-disk image already referenced by that product.
-const ENTRY_CONFIGS: EntryConfig[] = [
-  {
-    productId: 'tee-oversized',
-    image: '/images/products/t-shirt-oversized-white.png',
-    preferVariantId: 'tee-ovs-white',
-    preferColor: 'White',
-  },
-  {
-    productId: 'jogging-oversize-stussy',
-    image: '/images/products/stussy-1.webp',
-    preferVariantId: 'jos-ss-black',
-  },
-  {
-    productId: 'jogging-oversize-puma',
-    image: '/images/products/puma-1.webp',
-    preferVariantId: 'jos-pm-black',
-  },
-];
+const ENTRY_CONFIGS: EntryConfig[] = [];
 
 function resolveVariant(product: Product, cfg: EntryConfig): ProductVariant | undefined {
   // (1) Variant whose image is the chosen display image.
